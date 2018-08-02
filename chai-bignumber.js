@@ -1,22 +1,27 @@
-module.exports = function(BigNumber){
+module.exports = function (BigNumber, BN = null) {
 
   BigNumber = BigNumber || require('bignumber.js');
 
   return function (chai, utils) {
-    chai.Assertion.addProperty('bignumber', function() {
+    chai.Assertion.addProperty('bignumber', function () {
       utils.flag(this, 'bignumber', true);
     });
 
-    var isBigNumber = function(object) {
+    var isBigNumber = function (object) {
       return object.isBigNumber ||
-             object instanceof BigNumber ||
-             (object.constructor && object.constructor.name === 'BigNumber')
+        object instanceof BigNumber ||
+        (object.constructor && object.constructor.name === 'BigNumber')
     }
 
-    var convert = function(value, dp, rm) {
+    var isBN = function (object) {
+      return (BN && (BN.isBN(object) || object instanceof BN)) ||
+        (object.constructor && object.constructor.name === 'BN')
+    }
+
+    var convert = function (value, dp, rm) {
       var number;
 
-      if (typeof value === 'string' || typeof value === 'number') {
+      if (typeof value === 'string' || typeof value === 'number' || isBN(value)) {
         number = new BigNumber(value);
       } else if (isBigNumber(value)) {
         number = value;
@@ -35,9 +40,9 @@ module.exports = function(BigNumber){
       return number;
     };
 
-    var override = function(fn) {
+    var override = function (fn) {
       return function (_super) {
-        return function(value, dp, rm) {
+        return function (value, dp, rm) {
           if (utils.flag(this, 'bignumber')) {
             var expected = convert(value, dp, rm);
             var actual = convert(this._obj, dp, rm);
@@ -50,9 +55,9 @@ module.exports = function(BigNumber){
     };
 
     // BigNumber.equals
-    var equals = override(function(expected, actual) {
+    var equals = override(function (expected, actual) {
       this.assert(
-        expected.equals(actual),
+        new BigNumber(expected).isEqualTo(new BigNumber(actual)),
         'expected #{act} to equal #{exp}',
         'expected #{act} to be different from #{exp}',
         expected.toString(),
@@ -64,9 +69,9 @@ module.exports = function(BigNumber){
     chai.Assertion.overwriteMethod('eq', equals);
 
     // BigNumber.greaterThan
-    var greaterThan = override(function(expected, actual) {
+    var greaterThan = override(function (expected, actual) {
       this.assert(
-        actual.greaterThan(expected),
+        actual.isGreaterThan(expected),
         'expected #{act} to be greater than #{exp}',
         'expected #{act} to be less than or equal to #{exp}',
         expected.toString(),
@@ -78,9 +83,9 @@ module.exports = function(BigNumber){
     chai.Assertion.overwriteMethod('greaterThan', greaterThan);
 
     // BigNumber.greaterThanOrEqualTo
-    var greaterThanOrEqualTo = override(function(expected, actual) {
+    var greaterThanOrEqualTo = override(function (expected, actual) {
       this.assert(
-        actual.greaterThanOrEqualTo(expected),
+        actual.isGreaterThanOrEqualTo(expected),
         'expected #{act} to be greater than or equal to #{exp}',
         'expected #{act} to be less than #{exp}',
         expected.toString(),
@@ -91,9 +96,9 @@ module.exports = function(BigNumber){
     chai.Assertion.overwriteMethod('gte', greaterThanOrEqualTo);
 
     // BigNumber.lessThan
-    var lessThan = override(function(expected, actual) {
+    var lessThan = override(function (expected, actual) {
       this.assert(
-        actual.lessThan(expected),
+        actual.isLessThan(expected),
         'expected #{act} to be less than #{exp}',
         'expected #{act} to be greater than or equal to #{exp}',
         expected.toString(),
@@ -105,9 +110,9 @@ module.exports = function(BigNumber){
     chai.Assertion.overwriteMethod('lessThan', lessThan);
 
     // BigNumber.lessThanOrEqualTo
-    var lessThanOrEqualTo = override(function(expected, actual) {
+    var lessThanOrEqualTo = override(function (expected, actual) {
       this.assert(
-        actual.lessThanOrEqualTo(expected),
+        actual.isLessThanOrEqualTo(expected),
         'expected #{act} to be less than or equal to #{exp}',
         'expected #{act} to be greater than #{exp}',
         expected.toString(),
