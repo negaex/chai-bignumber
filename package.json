@@ -8,10 +8,11 @@
     "test": "mocha test/*.js"
   },
   "devDependencies": {
-    "bignumber.js": "^7.2.1",
-    "chai": "^3.5.0",
-    "jshint": "^2.9.2",
-    "mocha": "^2.5.3"
+    "bignumber.js": "^9.0.0",
+    "bn.js": "^5.0.0",
+    "chai": "^4.2.0",
+    "jshint": "^2.10.2",
+    "mocha": "^6.2.2"
   },
   "author": "António Marques <me@antoniomarques.eu>",
   "license": "MIT",

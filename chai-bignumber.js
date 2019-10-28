@@ -1,6 +1,7 @@
-module.exports = function (BigNumber, BN = null) {
+module.exports = function (BigNumber, BN) {
 
   BigNumber = BigNumber || require('bignumber.js');
+  BN = BN || require('bn.js');
 
   return function (chai, utils) {
     chai.Assertion.addProperty('bignumber', function () {
@@ -27,7 +28,7 @@ module.exports = function (BigNumber, BN = null) {
         number = value;
       } else {
         new chai.Assertion(value).assert(false,
-          'expected #{act} to be an instance of string, number or BigNumber');
+          'expected #{act} to be an instance of string, number, BigNumber or BN');
       }
 
       if (parseInt(dp) === dp) {
